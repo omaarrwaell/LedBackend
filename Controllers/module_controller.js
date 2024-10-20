@@ -5,8 +5,6 @@ const moduleCreation = asyncHandler(async (req, res) => {
     const width = req.body.width;
     const height = req.body.height;
     const pixelpitch = req.body.pixelpitch;
-    console.log(req.body)
-    console.log(width + "  " + height + " " + pixelpitch);
     try {
         const moduleToCreate = await Module.create(
             {
