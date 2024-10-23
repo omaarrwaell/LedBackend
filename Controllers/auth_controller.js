@@ -17,7 +17,7 @@ const userRegistration = asyncHandler(async (req, res) => {
     });
     res.status(200).json(userToRegister);
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message, keyValue: error.keyValue });
   }
 });
 
