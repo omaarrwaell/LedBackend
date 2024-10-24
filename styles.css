@@ -1,0 +1,152 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f8f8f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 80%;
+  max-width: 1200px;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Tabs */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  background-color: #f2f2f2;
+  padding: 15px 0;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab {
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  position: relative;
+}
+
+.tab.active {
+  font-weight: bold;
+  color: orange;
+}
+
+.tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 4px;
+  background-color: orange;
+}
+
+/* Wall Display Section */
+.wall-display {
+  position: relative;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image Container with Zoom Controls */
+.image-container {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+  margin: 20px 0;
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.zoom-controls {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  background-color: orange;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Measurement Indicators */
+.measurement {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  max-width: 800px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.measurement span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.horizontal-line,
+.vertical-line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: #ddd;
+  margin: 0 5px;
+}
+
+/* Info Section */
+.info {
+  margin-top: 15px;
+  text-align: left;
+  font-size: 16px;
+  color: #444;
+}
+
+.info p {
+  margin: 4px 0;
+}
+
+/* Person Figure */
+.person-figure {
+  position: absolute;
+  bottom: 20px;
+  left: 10%;
+}
+
+.person-figure img {
+  height: 150px;
+  width: auto;
+  opacity: 0.7;
+}

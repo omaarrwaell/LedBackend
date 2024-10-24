@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LED Configurator</title>
+    <style>
+      .configurator-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+      }
+
+      .unit-toggle button {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+      }
+
+      .unit-toggle .active {
+        background-color: #100a7bbf;
+        color: white;
+      }
+
+      .wall-dimensions div {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+      }
+
+      .wall-dimensions label {
+        margin-right: 10px;
+      }
+
+      .wall-dimensions button {
+        padding: 5px 10px;
+        margin: 0 10px;
+        cursor: pointer;
+      }
+
+      .screen-preview {
+        justify-content: center;
+        align-items: center;
+        width: 80%;
+        background-color: #aca4a4;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .screen {
+        position: relative;
+        display: inline-block;
+        border: 2px solid #333;
+        box-sizing: border-box;
+      }
+
+      .screen img {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Dotted line styles for spacing */
+      .dotted-line {
+        position: absolute;
+        border: 0.5px dashed rgb(117, 115, 115);
+      }
+
+      .dotted-top {
+        top: -20px;
+        left: 0px;
+        width: 100%;
+      }
+
+      .dotted-bottom {
+        bottom: -20px;
+        left: 0;
+        width: 100%;
+        height: 0px;
+      }
+
+      .dotted-left {
+        top: 0;
+        left: -20px;
+        height: 100%;
+      }
+
+      .dotted-right {
+        top: 0;
+        right: -20px;
+        height: 100%;
+      }
+
+      .screen-size-adjust {
+        margin-top: 20px;
+        flex-direction: row;
+      }
+
+      .distance-label {
+        position: absolute;
+        background-color: white;
+        padding: 2px 5px;
+        font-size: 12px;
+        border-radius: 5px;
+      }
+
+      /* Positioning labels */
+      .label-top-left {
+        top: -25px;
+        left: -40px;
+      }
+
+      .label-top-right {
+        top: -25px;
+        right: -40px;
+      }
+
+      .label-bottom-left {
+        bottom: -30px;
+        left: -40px;
+      }
+
+      .label-bottom-right {
+        bottom: -30px;
+        right: -45px;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        let unit = "Meter";
+        let wallWidth = 7;
+        let wallHeight = 4;
+        let screenWidth = 640;
+        let screenHeight = 360;
+
+        const calculateDistance = () => {
+          const horizontalDistance = (
+            (wallWidth * 100 - screenWidth) /
+            2 /
+            100
+          ).toFixed(2); // Convert to meters
+          const verticalDistance = (
+            (wallHeight * 100 - screenHeight) /
+            2 /
+            100
+          ).toFixed(2); // Convert to meters
+
+          return { horizontalDistance, verticalDistance };
+        };
+
+
+        const updateDisplay = () => {
+          document.getElementById("wallWidth").textContent = wallWidth;
+          document.getElementById("wallHeight").textContent = wallHeight;
+          document.getElementById("screenWidth").textContent = `${(
+            screenWidth / 1000
+          ).toFixed(2)}m (${screenWidth}px)`;
+          document.getElementById("screenHeight").textContent = `${(
+            screenHeight / 1000
+          ).toFixed(2)}m (${screenHeight}px)`;
+
+          document.querySelector(".screen-preview").style.height = `${
+            wallHeight * 100
+          }px`;
+          document.querySelector(".screen-preview").style.width = `${
+            wallWidth * 100
+          }px`;
+          document.querySelector(".screen").style.width = `${screenWidth}px`;
+          document.querySelector(".screen").style.height = `${screenHeight}px`;
+
+          const { horizontalDistance, verticalDistance } = calculateDistance();
+          // Update distance labels
+          document.getElementById(
+            "label-top-left"
+          ).textContent = `${horizontalDistance} m`;
+          document.getElementById(
+            "label-top-right"
+          ).textContent = `${horizontalDistance} m`;
+          document.getElementById(
+            "label-bottom-left"
+          ).textContent = `${verticalDistance} m`;
+          document.getElementById(
+            "label-bottom-right"
+          ).textContent = `${verticalDistance} m`;
+        };
+
+        const handleWallWidthChange = (change) => {
+          wallWidth = Math.max(1, wallWidth + change);
+          updateDisplay();
+        };
+
+        const handleWallHeightChange = (change) => {
+          wallHeight = Math.max(1, wallHeight + change);
+          updateDisplay();
+        };
+
+        const handleScreenWidthChange = (change) => {
+          screenWidth = Math.max(
+            100,
+            Math.min(screenWidth + change, wallWidth * 100)
+          );
+          updateDisplay();
+        };
+
+        const handleScreenHeightChange = (change) => {
+          screenHeight = Math.max(
+            100,
+            Math.min(screenHeight + change, wallHeight * 100)
+          );
+          distanceFromWall = updateDisplay();
+        };
+
+        const resetSettings = () => {
+          wallWidth = 7;
+          wallHeight = 4;
+          screenWidth = 640;
+          screenHeight = 360;
+          updateDisplay();
+        };
+
+        // Event listeners
+        document.getElementById("meterBtn").addEventListener("click", () => {
+          unit = "Meter";
+          updateDisplay();
+        });
+        document.getElementById("feetBtn").addEventListener("click", () => {
+          unit = "Feet";
+          updateDisplay();
+        });
+        document
+          .getElementById("wallWidthPlus")
+          .addEventListener("click", () => handleWallWidthChange(1));
+        document
+          .getElementById("wallWidthMinus")
+          .addEventListener("click", () => handleWallWidthChange(-1));
+        document
+          .getElementById("wallHeightPlus")
+          .addEventListener("click", () => handleWallHeightChange(1));
+        document
+          .getElementById("wallHeightMinus")
+          .addEventListener("click", () => handleWallHeightChange(-1));
+        document
+          .getElementById("screenWidthPlus")
+          .addEventListener("click", () => handleScreenWidthChange(40));
+        document
+          .getElementById("screenWidthMinus")
+          .addEventListener("click", () => handleScreenWidthChange(-40));
+        document
+          .getElementById("screenHeightPlus")
+          .addEventListener("click", () => handleScreenHeightChange(40));
+        document
+          .getElementById("screenHeightMinus")
+          .addEventListener("click", () => handleScreenHeightChange(-40));
+        document
+          .getElementById("resetBtn")
+          .addEventListener("click", resetSettings);
+
+        updateDisplay();
+      });
+    </script>
+  </head>
+  <body>
+    <div class="configurator-container">
+      <div class="controls">
+        <div class="unit-toggle">
+          <button id="meterBtn" class="active">Meter</button>
+          <button id="feetBtn">Feet</button>
+        </div>
+        <div class="wall-dimensions">
+          <div>
+            <label>Wall Width (m):</label>
+            <button id="wallWidthMinus">-</button>
+            <span id="wallWidth">7</span>
+            <button id="wallWidthPlus">+</button>
+          </div>
+          <div>
+            <label>Wall Height (m):</label>
+            <button id="wallHeightMinus">-</button>
+            <span id="wallHeight">4</span>
+            <button id="wallHeightPlus">+</button>
+          </div>
+          <div class="screen-size-adjust">
+            <label>Screen Width (m):</label>
+            <button
+              id="screenWidthMinus"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+            >
+              -
+            </button>
+            <span id="screenWidth">0.64m (640px)</span>
+            <button id="screenWidthPlus">+</button>
+            <br />
+            <label>Screen Height (m):</label>
+            <button id="screenHeightMinus">-</button>
+            <span id="screenHeight">0.36m (360px)</span>
+            <button id="screenHeightPlus">+</button>
+          </div>
+        </div>
+        <button id="resetBtn" style="color: green">Reset</button>
+      </div>
+
+      <div class="screen-preview" style="height: 400px; width: 700px">
+        <div class="screen" style="width: 640px; height: 360px">
+          <img
+            src="pix.jpg"
+            alt="LED Screen"
+            style="width: 100%; height: 100%; object-fit: cover"
+          />
+          <div class="dotted-line dotted-top"></div>
+          <div class="dotted-line dotted-bottom"></div>
+          <div class="dotted-line dotted-left"></div>
+          <div class="dotted-line dotted-right"></div>
+
+          <div class="distance-label label-top-left" id="label-top-left"></div>
+          <div
+            class="distance-label label-top-right"
+            id="label-top-right"
+          ></div>
+          <div
+            class="distance-label label-bottom-left"
+            id="label-bottom-left"
+          ></div>
+          <div
+            class="distance-label label-bottom-right"
+            id="label-bottom-right"
+          ></div>
+        </div>
+        <canvas id="canvas" width="640" height="360"></canvas>
+      </div>
+    </div>
+  </body>
+</html>
