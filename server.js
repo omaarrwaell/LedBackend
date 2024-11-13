@@ -32,7 +32,8 @@ app.get("/users", async (req, res) => {
 
 app.use("/module", require("./Routes/module_routes"));
 app.use("/auth", require("./Routes/auth_routes"));
-
+app.use("/controller", require("./Routes/controller_routes"));
+app.use("/screen", require("./Routes/screen_routes"));
 // Start the server
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
