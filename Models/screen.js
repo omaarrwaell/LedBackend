@@ -11,11 +11,11 @@ const screenSchema = new mongoose.Schema({
     module: {   type:mongoose.Schema.Types.ObjectId,ref:'Module' },
     numberOfReceivingCards: { type: Number, required: false },
     controller: {   type:mongoose.Schema.Types.ObjectId,ref:'Controller' },
-    powerSupply: { type: String, required: false },
-    steelStructure: { type: String, required: false },
+    powerSupplyNumber: { type: Number, required: false },
     category: { type: String, required: true },
     viewingDistance: { type: Number, required: false },
-    price : { type: Number, required: false }
+    price : { type: Number, required: false },
+    cabinetsNumber:{ type: Number, required: false },
 
 });
 

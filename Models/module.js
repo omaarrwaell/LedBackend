@@ -1,3 +1,4 @@
+const { type } = require('express/lib/response');
 const mongoose = require('mongoose');
 
 // Define the Module schema
@@ -14,14 +15,11 @@ const ModuleSchema = new mongoose.Schema({
     type: Number,
     required: true
   }
-  ,category:{
+  ,type : {
     type: String,
     required: true
   }
-  ,price:{
-    type: Number,
-    required: true
-  }
+  
 });
 
 // Create the Module model

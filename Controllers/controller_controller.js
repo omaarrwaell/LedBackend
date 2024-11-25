@@ -14,12 +14,16 @@ const getAllControllers = asyncHandler(async (req, res) => {
 //create function to add a new controller
 const controllerCreation = asyncHandler(async (req, res) => {
     const maxPixelCapacity = req.body.maxPixelCapacity;
-    const powerNeeded = req.body.powerNeeded;
+    const portsNumber = req.body.portsNumber;
+    const name = req.body.name;
+    const price = req.body.price;
     try {
         const controllerToCreate = await Controller.create(
             {
                 maxPixelCapacity,
-                powerNeeded
+                portsNumber,
+                name,
+                price
             }
         );
 

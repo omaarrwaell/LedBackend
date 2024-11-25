@@ -1,3 +1,4 @@
+const { type } = require('express/lib/response');
 const mongoose = require('mongoose');
 
 // Define the Module schema
@@ -6,12 +7,16 @@ const ControllerSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  powerNeeded: {
+  portsNumber: {
     type: Number,
     required: true
   }
   ,price : {
     type: Number,
+    required: true
+  },
+  name:{
+    type: String,
     required: true
   }
 });

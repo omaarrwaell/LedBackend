@@ -61,36 +61,59 @@ const calculateScreen = asyncHandler(async (req, res) => {
     const modulesInWidth = Math.floor(width / moduleWidth);
     const modulesInHeight = Math.floor(height / moduleHeight);
     let totalModules = modulesInWidth * modulesInHeight;
+    let cabinetsNumber = totalModules /18;
+    let powerSupplyNumber = totalModules/6;
+    let numberOfReceivingCards = cabinetsNumber ;
 
     const screenWidth = modulesInWidth*moduleWidth;
     const screenHeight = modulesInHeight*moduleHeight;
     let viewingDistance = 0;
-    if(type === "indoor"){
-         viewingDistance = module.pixelpitch*2
-    }
-    else if (type === "outdoor") {
+    const pixelsPerModule = Math.floor((moduleWidth / (module.pixelpitch / 1000)) * (moduleHeight / (module.pixelpitch / 1000)));
+    const totalPixels = totalModules * pixelsPerModule;
+    
+    
+     if (type === "outdoor") {
         viewingDistance = module.pixelpitch*3
+    }else{
+        viewingDistance = module.pixelpitch*2
     }
-    let controller;
-    if (totalPixels < 2600000) {
-        recommendedControlSystem = "Recommended Control System: NovaStar VX400";
-        controller = await Controller.findOne({ maxPixelCapacity: { $gte: totalPixels } });
-    } else if (totalPixels < 39000000) {
-        recommendedControlSystem = "Recommended Control System: NovaStar VX600";
-        controller = await Controller.findOne({ maxPixelCapacity: { $gte: totalPixels } });
-    } else if (totalPixels < 6500000) {
-        recommendedControlSystem = "Recommended Control System: NovaStar VX1000";
-        controller = await Controller.findOne({ maxPixelCapacity: { $gte: totalPixels } });
-    } else {
-        recommendedControlSystem = "No suitable control system available for the pixel count.";
+    
+    const suitableControllers = Controller.filter(controller => 
+        (controller.portsNumber * controller.maxPixelCapacity) >= totalPixels
+    );
+
+    if (suitableControllers.length === 0) {
+        // No suitable controller found
+        return null;
     }
-    totalPrice =  controller.price + module.price*totalModules;
+
+    // Find the controller with the smallest excess capacity
+    let bestController = suitableControllers[0];
+    let minExcessCapacity = (bestController.portsNumber * bestController.maxPixelCapacity) - totalPixels;
+
+    for (let i = 1; i < suitableControllers.length; i++) {
+        const currentController = suitableControllers[i];
+        const currentCapacity = currentController.portsNumber * currentController.maxPixelCapacity;
+        const excessCapacity = currentCapacity - totalPixels;
+
+        if (excessCapacity < minExcessCapacity) {
+            bestController = currentController;
+            minExcessCapacity = excessCapacity;
+        }
+    }
+
+    
+    
     res.status(200).json({
         totalModules,
-        recommendedControlSystem,
+        bestController,
         screenWidth,
         screenHeight,
+        cabinetsNumber,
         viewingDistance,
+        powerSupplyNumber,
+        numberOfReceivingCards,
+        totalPixels,
         totalPrice
     });
 

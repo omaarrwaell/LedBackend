@@ -8,7 +8,8 @@ const app = express();
 
 // Middleware to parse incoming JSON data
 app.use(express.json());
-
+ // For JSON payloads
+app.use(express.urlencoded({ extended: true }));
 const cors = require("cors");
 app.use(cors());
 

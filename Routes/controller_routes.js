@@ -5,8 +5,9 @@ const {
     controllerCreation,
     getAllControllers
 } = require("../Controllers/controller_controller");
+const {protect} = require("../middlewares/authmiddleware");
 
-router.post("/addController", controllerCreation);
-router.get("/getAllControllers", getAllControllers);
+router.post("/addController",protect, controllerCreation);
+router.get("/getAllControllers",protect, getAllControllers);
 
 module.exports = router;
