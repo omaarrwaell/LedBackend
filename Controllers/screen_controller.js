@@ -53,35 +53,40 @@ const calculateScreen = asyncHandler(async (req, res) => {
     const moduleId = req.body.module;
     const type = req.body.type;
 
-
+    console.log(width,height,moduleId);
     const module = await Module.findById(moduleId);
 
     const moduleWidth = module.width;
     const moduleHeight = module.height;
-    const modulesInWidth = Math.floor(width / moduleWidth);
-    const modulesInHeight = Math.floor(height / moduleHeight);
-    let totalModules = modulesInWidth * modulesInHeight;
-    let cabinetsNumber = totalModules /18;
-    let powerSupplyNumber = totalModules/6;
-    let numberOfReceivingCards = cabinetsNumber ;
-
-    const screenWidth = modulesInWidth*moduleWidth;
-    const screenHeight = modulesInHeight*moduleHeight;
-    let viewingDistance = 0;
-    const pixelsPerModule = Math.floor((moduleWidth / (module.pixelpitch / 1000)) * (moduleHeight / (module.pixelpitch / 1000)));
-    const totalPixels = totalModules * pixelsPerModule;
+    const modulesInWidth = Math.floor(width*100 / moduleWidth);
+    const modulesInHeight = Math.floor(height*100/ moduleHeight);
+    console.log(modulesInWidth,modulesInHeight);
     
+    
+    let cabinetsNumber = width*height;
+    let totalModules = cabinetsNumber*18;
+    let powerSupplyNumber = cabinetsNumber*3;
+    let numberOfReceivingCards = cabinetsNumber ;
+    console.log(cabinetsNumber,powerSupplyNumber,numberOfReceivingCards,totalModules);
+    const screenWidth = width*0.96;
+    const screenHeight = height*0.96;
+    console.log(screenWidth,screenHeight);
+    let viewingDistance = 0;
+    const pixelsPerModule = Math.floor((moduleWidth*10 / module.pixelpitch ) * (moduleHeight*10 / module.pixelpitch  ));
+    const totalPixels = totalModules * pixelsPerModule;
+    console.log(totalPixels);
     
      if (type === "outdoor") {
         viewingDistance = module.pixelpitch*3
     }else{
         viewingDistance = module.pixelpitch*2
     }
+    const controllers = await Controller.find();
     
-    const suitableControllers = Controller.filter(controller => 
+    const suitableControllers = controllers.filter(controller => 
         (controller.portsNumber * controller.maxPixelCapacity) >= totalPixels
     );
-
+   console.log(suitableControllers);
     if (suitableControllers.length === 0) {
         // No suitable controller found
         return null;
@@ -102,7 +107,28 @@ const calculateScreen = asyncHandler(async (req, res) => {
         }
     }
 
-    
+    let screenArea = screenWidth * screenHeight;
+    let totalPrice = 0;
+    if(module.pixelpitch ==1.8 && module.type == "indoor_GOB"){
+        totalPrice = 94500 * screenArea;
+    }
+    else if(module.pixelpitch ==1.8 && module.type == "indoor_flex"){
+         totalPrice = 90450 * screenArea;
+    }else if(module.pixelpitch ==1.8 && module.type == "indoor"){
+        totalPrice = 75600 * screenArea;
+    }else if(module.pixelpitch == 2.5 ){
+        totalPrice = 53325 * screenArea;
+    }else if(module.pixelpitch == 4 && module.type == "indoor"){
+        totalPrice = 41175* screenArea;
+    }else if(module.pixelpitch == 4 && module.type == "outdoor"){
+        totalPrice = 116100* screenArea;
+    }else if(module.pixelpitch == 5 ){
+        totalPrice = 60075* screenArea;
+    }else if(module.pixelpitch == 8 ){
+        totalPrice = 51975* screenArea;
+    }
+    totalPrice+= bestController.price;
+    totalPrice+= screenArea*5000;
     
     res.status(200).json({
         totalModules,
@@ -114,7 +140,8 @@ const calculateScreen = asyncHandler(async (req, res) => {
         powerSupplyNumber,
         numberOfReceivingCards,
         totalPixels,
-        totalPrice
+        totalPrice,
+        screenArea
     });
 
 });
