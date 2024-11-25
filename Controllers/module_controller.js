@@ -5,16 +5,19 @@ const moduleCreation = asyncHandler(async (req, res) => {
     const width = req.body.width;
     const height = req.body.height;
     const pixelpitch = req.body.pixelpitch;
+    const type = req.body.type;
     try {
         const moduleToCreate = await Module.create(
             {
                 width,
                 height,
-                pixelpitch
+                pixelpitch,
+                type
             }
         );
 
         res.status(200).json(moduleToCreate);
+        res.send(moduleToCreate);
     } catch (error) {
         console.log(error);
         res.status(500).json({ "error": error })
