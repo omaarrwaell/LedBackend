@@ -2,31 +2,281 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LED Configurator</title>
     <style>
-      .configurator-container {
+      body {
+        background-image: url("frame.jpg");
+        background-size: cover;
+        background-position: center -200px;
+        overflow: hidden;
+      }
+      /* Google Fonts Import Link */
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+      .nav-links {
+        display: flex;
+        justify-content: space-around;
+        width: 40%;
+        background: #fff;
+        left: 550px;
+        padding: 20px 10px;
+        border-radius: 12px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        margin: 0;
+      }
+
+      .nav-links li {
+        list-style: none;
+        margin: 0px 12px;
+        position: relative;
+        flex: 1;
+        text-align: center;
+      }
+
+      .nav-links li a {
+        color: #333;
+        font-size: 20px;
+        font-weight: 500;
+        padding: 6px 0;
+        text-decoration: none;
+        display: block;
+        cursor: pointer;
+      }
+
+      .nav-links li a:before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 0%;
+        background: #ff9800;
+        border-radius: 12px;
+        transition: all 0.4s ease;
+      }
+
+      .nav-links li a:hover:before {
+        width: 100%;
+      }
+
+      .dropdown-container {
+        opacity: 0;
+        transition: opacity 0.3s ease; /* Smooth animation */
+        display: none; /* Initially hidden */
+        justify-self: center;
+        width: 42%; /* Full width of navbar */
+        background-color: #fff;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        border-radius: 8px 8px 8px 8px;
+        padding: 10px 0;
+        z-index: 100;
+      }
+      /* Show state: Full opacity and original position */
+      /* Dropdowns */
+      .dropdown {
+        max-height: 0px; /* Collapsed by default */
+        overflow: hidden; /* Prevent overflow */
+        opacity: 0; /* Hidden initially */
+        transition: max-height 0.5s ease, opacity 0.3s ease; /* Smooth animation */
+      }
+      .dropdown h2 {
+        color: #ff9800;
+        margin-bottom: 15px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-evenly;
+        margin-bottom: 15px;
+      }
+      .row-2 {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+
+      .dropdown-item,
+      .input-item {
+        width: 40%;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        padding-right: 150px;
+      }
+
+      label {
+        margin-bottom: 5px;
+        font-weight: 900;
+        font-size: large;
+        color: #333;
+      }
+      select,
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s;
+      }
+
+      /* Hover effect: Change border to orange */
+      select:hover,
+      input[type="number"]:hover {
+        border-color: #ff9800;
+      }
+
+      /* Style the selected option */
+      select option:checked {
+        background-color: #ff9800;
+        color: white;
+      }
+
+      .dropdown-container h2 {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 24px;
+        color: #ff9800;
+      }
+
+      .output-options {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+      }
+
+      .option {
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .option img {
+        width: 200px;
+        height: 200px;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+      .option video {
+        width: 250px;
+        height: 150px;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
+      #export-btn {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .fitted-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: relative;
+      }
+
+      .dropdown-container ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .dropdown-container li {
+        padding: 10px 20px;
+      }
+
+      .dropdown-container li a {
+        color: #333;
+        font-size: 16px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .dropdown-container li a:hover {
+        background-color: #ff9800;
+        color: white;
+        border-radius: 8px;
+      }
+
+      .configurator-container {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        align-items: start;
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+      }
+
+      button {
+        border: none;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        background-color: #ffb793;
+        opacity: 0.7;
+      }
+
+      button:disabled:hover {
+        background-color: #ffb793;
+        opacity: 0.7;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .button:hover {
+        background-color: #000000;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .width-btn,
+      .width-btn2 {
+        background-color: #f8722f;
+        border-radius: 20px 10px 10px 20px;
+        width: 70px;
+        height: 1px;
+        align-items: start;
+        justify-content: start;
+      }
+
+      .width-btn2 {
+        transform: rotate(180deg);
+      }
+
+      .heigth-btn,
+      .heigth-btn2 {
+        background-color: #f8722f;
+        border-radius: 20px 10px 10px 20px;
+        width: 70px;
+        height: 1px;
+        align-items: start;
+        justify-content: start;
+        margin: 5px 5px 32px 32px;
+        transform: rotate(90deg);
+      }
+
+      .heigth-btn2 {
+        transform: rotate(-90deg);
       }
 
       .controls {
         display: flex;
+        align-items: center;
         flex-direction: column;
         margin-bottom: 20px;
-      }
-
-      .unit-toggle button {
-        padding: 10px;
-        margin: 5px;
-        border: 1px solid #ccc;
-        cursor: pointer;
-      }
-
-      .unit-toggle .active {
-        background-color: #100a7bbf;
-        color: white;
       }
 
       .wall-dimensions div {
@@ -45,166 +295,297 @@
         cursor: pointer;
       }
 
+      /* .preview-bkg {
+        margin-top: 20px;
+        align-items: center;
+        border-radius: 10px;
+        position: relative;
+        background-color: grey;
+        height: 60%;
+        width: 70%;
+      } */
+
+      .screen-preview-container {
+        padding: 150px;
+        width: 100%;
+        margin-left: 150px;
+        justify-items: center;
+        position: relative;
+        align-self: center;
+        flex-direction: row;
+        box-sizing: border-box;
+      }
+
+      .screen-width-settings {
+        align-items: center;
+        position: absolute;
+        left: 750px;
+        margin-top: 10px;
+      }
+      .screen-heigth-settings {
+        display: flex;
+        position: absolute;
+        top: 150px;
+        right: 200px;
+        flex-direction: column;
+      }
+
+      .shrink {
+        transition: transform 0.2s ease;
+      }
+
+      .expand {
+        transition: transform 0.2s ease;
+      }
+
       .screen-preview {
+        transition: width 0.5s ease, height 0.5s ease;
         justify-content: center;
         align-items: center;
+        position: relative;
         width: 80%;
-        background-color: #aca4a4;
-        padding: 40px;
+        background-color: #dbdbdb;
+        padding: 50px 50px 0px 50px;
         text-align: center;
+        border-radius: 20px;
       }
 
       .screen {
+        transition: width 0.5s ease, height 0.5s ease;
         position: relative;
         display: inline-block;
-        border: 2px solid #333;
+        align-items: center;
         box-sizing: border-box;
       }
 
       .screen img {
-        display: block;
-        max-width: 100%;
-        max-height: 100%;
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
 
-      /* Dotted line styles for spacing */
-      .dotted-line {
-        position: absolute;
-        border: 0.5px dashed rgb(117, 115, 115);
+      .dashed-line {
+        position: relative;
+        border-top: 2px dashed grey;
+        width: 90px;
+        right: 90px;
+        bottom: 4px;
       }
-
-      .dotted-top {
-        top: -20px;
-        left: 0px;
-        width: 100%;
+      .vertical-dashed-line {
+        width: 2px;
+        height: 40px;
+        border-left: 2px dashed grey;
       }
-
-      .dotted-bottom {
-        bottom: -20px;
-        left: 0;
-        width: 100%;
-        height: 0px;
+      .side-dashed-line {
+        position: relative;
+        border-top: 2px dashed grey;
+        width: 90px;
+        top: 100px;
+        align-self: flex-end;
       }
-
-      .dotted-left {
-        top: 0;
-        left: -20px;
-        height: 100%;
-      }
-
-      .dotted-right {
-        top: 0;
-        right: -20px;
-        height: 100%;
-      }
-
-      .screen-size-adjust {
-        margin-top: 20px;
-        flex-direction: row;
-      }
-
-      .distance-label {
-        position: absolute;
-        background-color: white;
-        padding: 2px 5px;
-        font-size: 12px;
-        border-radius: 5px;
-      }
-
-      /* Positioning labels */
-      .label-top-left {
-        top: -25px;
-        left: -40px;
-      }
-
-      .label-top-right {
-        top: -25px;
-        right: -40px;
-      }
-
-      .label-bottom-left {
-        bottom: -30px;
-        left: -40px;
-      }
-
-      .label-bottom-right {
-        bottom: -30px;
-        right: -45px;
+      .side-vertical-dashed-line {
+        position: relative;
+        width: 2px;
+        height: 50px;
+        border-left: 2px dashed grey;
       }
     </style>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        let unit = "Meter";
-        let wallWidth = 7;
-        let wallHeight = 4;
         let screenWidth = 640;
         let screenHeight = 360;
+        const screen = document.querySelector(".screen");
+        const videoElement = document.querySelector("#sample-video video"); // Select the video element
 
-        const calculateDistance = () => {
-          const horizontalDistance = (
-            (wallWidth * 100 - screenWidth) /
-            2 /
-            100
-          ).toFixed(2); // Convert to meters
-          const verticalDistance = (
-            (wallHeight * 100 - screenHeight) /
-            2 /
-            100
-          ).toFixed(2); // Convert to meters
+        // Event listener for clicking the video
+        videoElement.addEventListener("click", () => {
+          // Clone the video element to ensure it is reinitialized
+          const videoClone = videoElement.cloneNode(true);
 
-          return { horizontalDistance, verticalDistance };
-        };
+          // Ensure autoplay and other attributes are set
+          videoClone.autoplay = true;
+          videoClone.loop = true;
+          videoClone.muted = true;
+          videoClone.playsInline = true;
 
+          // Apply the 'fitted-video' class to the cloned video
+          videoClone.classList.add("fitted-video");
+          const img = screen.querySelector("img");
+          screen.replaceChild(videoClone, img);
+        });
+        // JavaScript to toggle only one dropdown at a time
+        document.querySelectorAll(".dropdown").forEach((dropdown) => {
+          dropdown.style.maxHeight = "0px"; // Collapse all dropdowns initially
+          dropdown.style.overflow = "hidden"; // Prevent content overflow
+          dropdown.style.opacity = "0"; // Hide content initially
+          dropdown.style.transition = "max-height 0.5s ease, opacity 0.3s ease"; // Smooth animation
+        });
+
+        const navLinks = document.querySelectorAll(".nav-links > li > a");
+        const dropdownContainer = document.getElementById("dropdown-container");
+        let activeDropdown = null;
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault(); // Prevent default link behavior
+
+            const targetDropdown = document.getElementById(
+              link.dataset.dropdown
+            );
+
+            if (activeDropdown === targetDropdown) {
+              // Close the currently open dropdown
+              closeDropdown(targetDropdown);
+              closeDropdownContainer(); // Hide container with animation
+              activeDropdown = null;
+            } else {
+              // Close any open dropdown first
+              if (activeDropdown) closeDropdown(activeDropdown);
+
+              // Open the new dropdown and container
+              openDropdown(targetDropdown);
+              openDropdownContainer(); // Show container with animation
+              activeDropdown = targetDropdown;
+            }
+          });
+        });
+
+        // Function to open a dropdown
+        function openDropdown(dropdown) {
+          dropdown.style.display = "block"; // Make sure it's visible
+          requestAnimationFrame(() => {
+            dropdown.style.maxHeight = dropdown.scrollHeight + "px"; // Expand smoothly
+            dropdown.style.opacity = "1"; // Fade in smoothly
+          });
+        }
+
+        // Function to close a dropdown
+        function closeDropdown(dropdown) {
+          dropdown.style.maxHeight = "0px"; // Collapse smoothly
+          dropdown.style.opacity = "0"; // Fade out smoothly
+
+          setTimeout(() => {
+            dropdown.style.display = "none"; // Ensure it's hidden after animation completes
+          }, 500); // Matches the transition duration
+        }
+
+        // Function to open the dropdown container with animation
+        function openDropdownContainer() {
+          dropdownContainer.style.display = "block"; // Make it visible
+          requestAnimationFrame(() => {
+            dropdownContainer.style.opacity = "1"; // Fade in
+          });
+        }
+
+        // Function to close the dropdown container with animation
+        function closeDropdownContainer() {
+          dropdownContainer.style.opacity = "0"; // Fade out smoothly
+
+          setTimeout(() => {
+            dropdownContainer.style.display = "none"; // Hide after animation completes
+          }, 300); // Matches the transition duration
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener("click", (e) => {
+          const clickedInsideNav = e.target.closest(".nav-links");
+          const clickedInsideDropdown = e.target.closest(".dropdown-container");
+
+          if (!clickedInsideNav && !clickedInsideDropdown && activeDropdown) {
+            closeDropdown(activeDropdown);
+            closeDropdownContainer(); // Hide container with animation
+            activeDropdown = null;
+          }
+        });
 
         const updateDisplay = () => {
-          document.getElementById("wallWidth").textContent = wallWidth;
-          document.getElementById("wallHeight").textContent = wallHeight;
-          document.getElementById("screenWidth").textContent = `${(
-            screenWidth / 1000
-          ).toFixed(2)}m (${screenWidth}px)`;
-          document.getElementById("screenHeight").textContent = `${(
-            screenHeight / 1000
-          ).toFixed(2)}m (${screenHeight}px)`;
-
-          document.querySelector(".screen-preview").style.height = `${
-            wallHeight * 100
+          const wallWidth =
+            parseFloat(document.getElementById("wallWidthInput").value) || 1;
+          const wallHeight =
+            parseFloat(document.getElementById("wallHeightInput").value) || 1;
+          const screenPreview = document.querySelector(".screen-preview");
+          const screen = document.querySelector(".screen");
+          let dashedLine = document.querySelector(".dashed-line");
+          let verticalDashedLine = document.querySelector(
+            ".vertical-dashed-line"
+          );
+          // const widthLabel = document.querySelector(
+          //   'label[for="screen-width-diff"]'
+          // );
+          // widthLabel.innerText = `${
+          //   (parseFloat(screenPreview.style.width) -
+          //     parseFloat(screen.style.width)) /
+          //   100
+          // }m`;
+          screenWidth = Math.min(screenWidth, wallWidth * 100);
+          screenHeight = Math.min(screenHeight, wallHeight * 100);
+          dashedLine.style.width = `${
+            parseFloat(screenPreview.style.width) -
+            parseFloat(screen.style.width)
           }px`;
-          document.querySelector(".screen-preview").style.width = `${
-            wallWidth * 100
-          }px`;
-          document.querySelector(".screen").style.width = `${screenWidth}px`;
-          document.querySelector(".screen").style.height = `${screenHeight}px`;
 
-          const { horizontalDistance, verticalDistance } = calculateDistance();
-          // Update distance labels
-          document.getElementById(
-            "label-top-left"
-          ).textContent = `${horizontalDistance} m`;
-          document.getElementById(
-            "label-top-right"
-          ).textContent = `${horizontalDistance} m`;
-          document.getElementById(
-            "label-bottom-left"
-          ).textContent = `${verticalDistance} m`;
-          document.getElementById(
-            "label-bottom-right"
-          ).textContent = `${verticalDistance} m`;
+          dashedLine.style.right = `${
+            parseFloat(screenPreview.style.width) -
+            parseFloat(screen.style.width)
+          }px`;
+
+          verticalDashedLine.style.height = `${
+            parseFloat(screenPreview.style.height) -
+              parseFloat(screen.style.height) ==
+            0
+              ? 40
+              : parseFloat(screenPreview.style.height) -
+                parseFloat(screen.style.height)
+          }px`;
+          // Update screen preview dimensions
+          screenPreview.style.width = `${wallWidth * 100}px`;
+          screenPreview.style.height = `${wallHeight * 100}px`;
+
+          screen.style.width = `${screenWidth}px`;
+          screen.style.height = `${screenHeight}px`;
+
+          // Disable or enable buttons based on limits
+          toggleButtonState(
+            document.getElementById("screenWidthPlus"),
+            screenWidth >= wallWidth * 100
+          );
+          toggleButtonState(
+            document.getElementById("screenWidthMinus"),
+            screenWidth <= 100
+          );
+          toggleButtonState(
+            document.getElementById("screenHeightPlus"),
+            screenHeight >= wallHeight * 100
+          );
+          toggleButtonState(
+            document.getElementById("screenHeightMinus"),
+            screenHeight <= 100
+          );
+
+          animateContainer(screenPreview);
         };
 
-        const handleWallWidthChange = (change) => {
-          wallWidth = Math.max(1, wallWidth + change);
-          updateDisplay();
+        const toggleButtonState = (button, disabled) => {
+          button.disabled = disabled;
+          button.style.cursor = disabled ? "not-allowed" : "pointer";
         };
 
-        const handleWallHeightChange = (change) => {
-          wallHeight = Math.max(1, wallHeight + change);
+        const animateContainer = (element) => {
+          element.classList.add("shrink");
+          setTimeout(() => {
+            element.classList.remove("shrink");
+            element.classList.add("expand");
+            setTimeout(() => element.classList.remove("expand"), 200);
+          }, 200);
+        };
+
+        const handleWallInputChange = () => {
           updateDisplay();
         };
 
         const handleScreenWidthChange = (change) => {
+          const wallWidth =
+            parseFloat(document.getElementById("wallWidthInput").value) || 1;
           screenWidth = Math.max(
             100,
             Math.min(screenWidth + change, wallWidth * 100)
@@ -213,42 +594,23 @@
         };
 
         const handleScreenHeightChange = (change) => {
+          const wallHeight =
+            parseFloat(document.getElementById("wallHeightInput").value) || 1;
           screenHeight = Math.max(
             100,
             Math.min(screenHeight + change, wallHeight * 100)
           );
-          distanceFromWall = updateDisplay();
-        };
-
-        const resetSettings = () => {
-          wallWidth = 7;
-          wallHeight = 4;
-          screenWidth = 640;
-          screenHeight = 360;
           updateDisplay();
         };
 
-        // Event listeners
-        document.getElementById("meterBtn").addEventListener("click", () => {
-          unit = "Meter";
-          updateDisplay();
-        });
-        document.getElementById("feetBtn").addEventListener("click", () => {
-          unit = "Feet";
-          updateDisplay();
-        });
+        // Event listeners for input changes
         document
-          .getElementById("wallWidthPlus")
-          .addEventListener("click", () => handleWallWidthChange(1));
+          .getElementById("wallWidthInput")
+          .addEventListener("input", handleWallInputChange);
         document
-          .getElementById("wallWidthMinus")
-          .addEventListener("click", () => handleWallWidthChange(-1));
-        document
-          .getElementById("wallHeightPlus")
-          .addEventListener("click", () => handleWallHeightChange(1));
-        document
-          .getElementById("wallHeightMinus")
-          .addEventListener("click", () => handleWallHeightChange(-1));
+          .getElementById("wallHeightInput")
+          .addEventListener("input", handleWallInputChange);
+
         document
           .getElementById("screenWidthPlus")
           .addEventListener("click", () => handleScreenWidthChange(40));
@@ -261,81 +623,147 @@
         document
           .getElementById("screenHeightMinus")
           .addEventListener("click", () => handleScreenHeightChange(-40));
-        document
-          .getElementById("resetBtn")
-          .addEventListener("click", resetSettings);
 
+        // Initial display update
         updateDisplay();
       });
     </script>
+    <script
+      src="https://kit.fontawesome.com/b058e10717.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
-  <body>
-    <div class="configurator-container">
-      <div class="controls">
-        <div class="unit-toggle">
-          <button id="meterBtn" class="active">Meter</button>
-          <button id="feetBtn">Feet</button>
-        </div>
-        <div class="wall-dimensions">
-          <div>
-            <label>Wall Width (m):</label>
-            <button id="wallWidthMinus">-</button>
-            <span id="wallWidth">7</span>
-            <button id="wallWidthPlus">+</button>
+  <body style="flex-direction: column">
+    <div>
+      <ul class="nav-links">
+        <li><a href="#" data-dropdown="scenario">Scenario Selection</a></li>
+        <li><a href="#" data-dropdown="display">Display Configuration</a></li>
+        <li><a href="#" data-dropdown="output">Output Configuration</a></li>
+      </ul>
+
+      <!-- Dropdown Container -->
+      <div class="dropdown-container" id="dropdown-container">
+        <!-- Scenario Selection -->
+        <ul class="dropdown" id="scenario">
+          <h2>Scenario Selection</h2>
+
+          <!-- First Row: Application and Unit Dropdowns -->
+          <div class="row">
+            <div class="dropdown-item">
+              <label for="applications">Applications</label>
+              <select id="applications">
+                <option>Indoor commercial</option>
+                <option>Outdoor large-scale</option>
+                <option>Conference room</option>
+              </select>
+            </div>
+            <div class="dropdown-item">
+              <label for="unit">Unit</label>
+              <select id="unit">
+                <option>Meter</option>
+                <option>Feet</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label>Wall Height (m):</label>
-            <button id="wallHeightMinus">-</button>
-            <span id="wallHeight">4</span>
-            <button id="wallHeightPlus">+</button>
+
+          <!-- Second Row: Wall Width and Height Inputs -->
+          <div class="row-2">
+            <div class="input-item">
+              <label for="wallWidth">Wall Width</label>
+              <input
+                type="number"
+                id="wallWidthInput"
+                min="4"
+                max="16"
+                value="7"
+              />
+            </div>
+            <div class="input-item">
+              <label for="wallHeight">Wall Height</label>
+              <input
+                type="number"
+                id="wallHeightInput"
+                min="1"
+                max="7"
+                value="4"
+              />
+            </div>
           </div>
-          <div class="screen-size-adjust">
-            <label>Screen Width (m):</label>
-            <button
-              id="screenWidthMinus"
-              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-            >
-              -
-            </button>
-            <span id="screenWidth">0.64m (640px)</span>
-            <button id="screenWidthPlus">+</button>
-            <br />
-            <label>Screen Height (m):</label>
-            <button id="screenHeightMinus">-</button>
-            <span id="screenHeight">0.36m (360px)</span>
-            <button id="screenHeightPlus">+</button>
+        </ul>
+
+        <!-- Display Configuration -->
+        <ul class="dropdown" id="display">
+          <h2>Display Configuration</h2>
+          <li><a href="#">Resolution</a></li>
+          <li><a href="#">Aspect Ratio</a></li>
+        </ul>
+
+        <!-- Output Configuration -->
+        <ul class="dropdown" id="output">
+          <h2>Output Configuration</h2>
+          <p style="text-align: center">
+            Please select a demo for your project
+          </p>
+
+          <div class="output-options">
+            <div id="default-image" class="option">
+              <img style="padding: 5px 5px" src="pix.jpg" alt="Default Image" />
+              <p>Default Image</p>
+            </div>
+
+            <div id="sample-video" class="option">
+              <video style="" autoplay loop muted playsinline>
+                <source
+                  src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                  type="video/mp4"
+                />
+
+                Your browser does not support the video tag.
+              </video>
+              <p>Sample Video</p>
+            </div>
           </div>
-        </div>
-        <button id="resetBtn" style="color: green">Reset</button>
+          <button id="export-btn">Export</button>
+        </ul>
       </div>
-
-      <div class="screen-preview" style="height: 400px; width: 700px">
-        <div class="screen" style="width: 640px; height: 360px">
-          <img
-            src="pix.jpg"
-            alt="LED Screen"
-            style="width: 100%; height: 100%; object-fit: cover"
-          />
-          <div class="dotted-line dotted-top"></div>
-          <div class="dotted-line dotted-bottom"></div>
-          <div class="dotted-line dotted-left"></div>
-          <div class="dotted-line dotted-right"></div>
-
-          <div class="distance-label label-top-left" id="label-top-left"></div>
-          <div
-            class="distance-label label-top-right"
-            id="label-top-right"
-          ></div>
-          <div
-            class="distance-label label-bottom-left"
-            id="label-bottom-left"
-          ></div>
-          <div
-            class="distance-label label-bottom-right"
-            id="label-bottom-right"
-          ></div>
+      <div class="configurator-container">
+        <div class="screen-heigth-settings">
+          <button class="button heigth-btn" id="screenHeightPlus">
+            <i
+              class="fa-solid fa-plus"
+              style="position: relative; bottom: 7px"
+            ></i>
+          </button>
+          <button class="button heigth-btn2" id="screenHeightMinus">
+            <i
+              class="fa-solid fa-minus"
+              style="position: relative; bottom: 7px"
+            ></i>
+          </button>
         </div>
-        <canvas id="canvas" width="640" height="360"></canvas>
+        <div class="screen-preview-container">
+          <div class="screen-preview">
+            <div class="screen">
+              <img src="pix.jpg" alt="LED Screen" />
+              <div class="dashed-line"></div>
+              <div class="vertical-dashed-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-width-settings">
+        <button class="button width-btn" id="screenWidthMinus">
+          <i
+            class="fa-solid fa-minus"
+            style="position: relative; bottom: 7px"
+          ></i>
+        </button>
+        <button class="button width-btn2" id="screenWidthPlus">
+          <i
+            class="fa-solid fa-plus"
+            style="position: relative; bottom: 7px"
+          ></i>
+        </button>
       </div>
     </div>
   </body>
