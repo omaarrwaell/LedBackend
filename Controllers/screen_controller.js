@@ -2,6 +2,12 @@ const asyncHandler = require("express-async-handler");
 const Screen = require("../Models/screen");
 const Module = require("../Models/module");
 const Controller = require("../Models/controller");
+const PDFDocumentKit = require('pdfkit');
+const { PDFDocument } = require('pdf-lib');
+const { exec } = require('child_process');
+//import PDFMerger from 'pdf-merger-js';
+
+const fs = require('fs');
 //create functions to get all screens and add a new screen
 const getAllScreens = asyncHandler(async (req, res) => {
     try {
@@ -55,7 +61,8 @@ const calculateScreen = asyncHandler(async (req, res) => {
 
     console.log(width,height,moduleId);
     const module = await Module.findById(moduleId);
-
+    const pixelpitch = module.pixelpitch;
+    const type2 = module.type;
     const moduleWidth = module.width;
     const moduleHeight = module.height;
     const modulesInWidth = Math.floor(width*100 / moduleWidth);
@@ -77,9 +84,9 @@ const calculateScreen = asyncHandler(async (req, res) => {
     console.log(totalPixels);
     
      if (type === "outdoor") {
-        viewingDistance = module.pixelpitch*3
+        viewingDistance = module.pixelpitch
     }else{
-        viewingDistance = module.pixelpitch*2
+        viewingDistance = module.pixelpitch
     }
     const controllers = await Controller.find();
     
@@ -131,6 +138,8 @@ const calculateScreen = asyncHandler(async (req, res) => {
     totalPrice+= screenArea*5000;
     
     res.status(200).json({
+        pixelpitch,
+        type2,
         totalModules,
         bestController,
         screenWidth,
@@ -145,6 +154,200 @@ const calculateScreen = asyncHandler(async (req, res) => {
     });
 
 });
+const generateStyledPDF = asyncHandler(async (req, res) => {
+    const doc = new PDFDocumentKit({ margin: 50 });
+    const screenData = req.body;
+    const { default: PDFMerger } = await import('pdf-merger-js');
+
+    const writeStream = fs.createWriteStream("./pdfs/quotation.pdf");
+    // Output File
+    doc.pipe(writeStream);
+
+    // Header Section
+    doc
+        .image('./sonic-final-2020.png', 50, 20, { width: 100 }) // Replace with your logo
+       
+        
+
+    doc.moveDown();
+    doc 
+        .moveDown()
+        .fontSize(10)
+        .text(`PI NO: CL202411716`, 50, 80)
+        .text(`INVOICE TO: `)
+        .text(`ATTN: `)
+        .text(`TEL: `)
+        .text(`COMPANY: `)
+        .text(`ADDRESS: `);
+
+   
+
+    // Table Header
+    doc
+        .moveDown()
+        .fontSize(10)
+        .text('S/N', 50, 160)
+        .text('Commodity', 100, 160,{ width: 140 })
+        .text('Quantity', 250, 160)
+        .text('Unit', 320, 160)
+        .text('Unit Price (EGP)', 380, 160)
+        .text('Total Price (EGP)', 460, 160);
+
+    doc.moveTo(50, 175).lineTo(550, 175).stroke();
+
+    // Table Rows
+    let y = 180;
+
+    // Add items based on new `screenData` structure
+    const items = [
+        {
+            name: `P${screenData.pixelpitch} ${screenData.type2}  LED display 
++Novastar receiver card+
+G-energy Power supply+
+Module Size: 32*16cm
+Display Size: ${screenData.screenWidth}*${screenData.screenHeight}m`,
+            quantity: 1,
+            unit: 'pcs',
+            unitPrice: 0,
+            totalPrice: screenData.totalPrice-screenData.bestController.price,
+        },
+        {
+            name: 'LED Modules',
+            quantity: screenData.totalModules,
+            unit: 'pcs',
+            unitPrice: 0,
+            totalPrice: screenData.totalModules * 0
+        },
+        {
+            name: `${screenData.bestController.name} Controller`,
+            quantity: 1,
+            unit: 'pcs',
+            unitPrice: screenData.bestController.price,
+            totalPrice: screenData.bestController.price
+        },
+        {
+            name: 'Power Supplies',
+            quantity: screenData.powerSupplyNumber,
+            unit: 'pcs',
+            unitPrice: 0,
+            totalPrice: screenData.powerSupplyNumber * 0
+        },
+        {
+            name: 'Receiving Cards',
+            quantity: screenData.numberOfReceivingCards,
+            unit: 'pcs',
+            unitPrice: 0,
+            totalPrice: screenData.numberOfReceivingCards * 0
+        }
+    ];
+
+    items.forEach((item, index) => {
+        const itemHeight = item.name.split('\n').length * 12;
+        doc
+            .fontSize(8)
+            .text(index + 1, 50, y)
+            .text(item.name, 100, y)
+            .text(item.quantity, 250, y)
+            .text(item.unit, 320, y)
+            .text(`${item.unitPrice.toFixed(2)}`, 380, y)
+            .text(`${item.totalPrice.toFixed(2)}`, 470, y);
+        y += Math.max(itemHeight, 20);
+    });
+
+    // Total Amount
+    doc.moveDown().moveTo(50, y).lineTo(550, y).stroke();
+
+    y += 10;
+    doc
+        .fontSize(12)
+        .text('Total Amount (EGP):', 340, y)
+        .text(`${screenData.totalPrice.toFixed(2)}`, 470, y);
+
+    // Footer Section
+    y += 40;
+    doc
+        .moveTo(50, y)
+        .lineTo(550, y)
+        .stroke()
+        .moveDown();
+
+    y += 10;
+    doc
+        .fontSize(10)
+        .text('Wire Transfer Banking Info', 50, y)
+        .moveDown()
+        .text(`Beneficiary Account (USD): `)
+        .text(`Beneficiary Name: `)
+        .text(`Swift Code: `)
+        .text(`Beneficiary Bank Name: `)
+        .text(`Beneficiary Bank Address:`)
+        .moveDown()
+        .text(`Warranty Terms: 3 years warranty. Customer to send broken parts for repair. Shipping costs shared.`)
+        .text(`Production Lead Time: 15-18 working days after payment.`)
+        .moveDown()
+        .text('Thank you for your business!', { align: 'center' });
+
+    // Finalize and Save
+    doc.end();
+    await new Promise((resolve) => writeStream.on("finish", resolve));
+    exec('python ./controllers/scripts/merge_pdfs.py', (error, stdout, stderr) => {
+        if (error) {
+            console.error('Error merging PDFs:', stderr);
+            res.status(500).json({ error: 'PDF merging failed' });
+            return;
+        }
+
+        res.status(200).json({
+            message: "PDF generated and merged successfully",
+            downloadLink: `${req.protocol}://${req.get('host')}/pdfs/final_quotation.pdf`,
+        });
+    });
+});
+
+// Example Data
+// const screenData = {
+//     buyerName: 'Gasser',
+//     buyerContact: 'Gasser',
+//     buyerPhone: '+20 11 15277881',
+//     buyerCompany: 'Sonic Technologies',
+//     buyerAddress: 'Address',
+//     items: [
+//         {
+//             name: 'P1.86 Indoor GOB Front Service LED Display',
+//             quantity: 48,
+//             unit: 'pcs',
+//             unitPrice: 265,
+//             totalPrice: 12720,
+//         },
+//         {
+//             name: 'Colorlight X20 Controller',
+//             quantity: 1,
+//             unit: 'pcs',
+//             unitPrice: 1950,
+//             totalPrice: 1950,
+//         },
+//         {
+//             name: 'Wooden Case',
+//             quantity: 6,
+//             unit: 'pcs',
+//             unitPrice: 50,
+//             totalPrice: 300,
+//         },
+//     ],
+//     totalPrice: 14970,
+//     bankDetails: {
+//         account: '4000027119201743521',
+//         name: 'SHENZHEN COLORLIT LED CO., LTD.',
+//         swift: 'ICBKCNBJSZN',
+//         bankName: 'Industrial and Commercial Bank of China',
+//         bankAddress: 'North Block, Financial Center, Shennan Road East, Shenzhen, China',
+//     },
+//     warranty: '3 years warranty. Customer to send broken parts for repair. Shipping costs shared.',
+//     leadTime: '15-18 working days after payment.',
+// };
+
+// Generate the PDF
+// generateStyledPDF(screenData, 'quotation.pdf');
 
 
 
@@ -179,4 +382,4 @@ const deleteScreen = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { getAllScreens, screenCreation ,calculateScreen, getScreenById, updateScreen, deleteScreen};
+module.exports = { getAllScreens, screenCreation ,calculateScreen, getScreenById, updateScreen, deleteScreen,generateStyledPDF};

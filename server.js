@@ -30,6 +30,7 @@ app.get("/users", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+app.use('/pdfs', express.static('pdfs'));
 
 app.use("/module", require("./Routes/module_routes"));
 app.use("/auth", require("./Routes/auth_routes"));
