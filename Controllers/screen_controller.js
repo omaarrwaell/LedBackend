@@ -286,21 +286,36 @@ Display Size: ${screenData.screenWidth}*${screenData.screenHeight}m`,
 
   doc.end();
   await new Promise((resolve) => writeStream.on("finish", resolve));
+  let pdf ;
+  if(screenData.pixelpitch == 1.86 && screenData.type2 == "indoor"){
+    pdf ="./pdfs/Indoor Q1.8-43S-H-1515 Specification.pdf";
+  }else if (screenData.pixelpitch == 1.8 && screenData.type2 == "indoor_GOB"){
+    pdf = "./pdfs/Indoor Q1.8-43S-H-1515 GOB Specification.pdf";
+  }else if(screenData.pixelpitch == 1.8 && screenData.type2 == "indoor_flex"){
+    pdf = "./pdfs/indoor Q1.8-43S-1515-H-R.pdf";
+  }else if(screenData.pixelpitch == 2.5 ){
+    pdf = "./pdfs/Indoor Q2.5-32s-H-2020 Specification.pdf";
+  }else if(screenData.pixelpitch == 4 ){
+    pdf = "./pdfs/Indoor Q4-20s-H-2020 Specification.pdf";
+  }else if(screenData.pixelpitch == 5){
+    pdf = "./pdfs/Outdoor Q5-8S-H-2525.pdf";
+  }else if(screenData.pixelpitch == 8){
+    pdf = "./pdfs/Outdoor Q8-5S-H-3535.pdf";
+  }
   exec(
-    "python ./controllers/scripts/merge_pdfs.py",
+    `python ./controllers/scripts/merge_pdfs.py "${pdf}"`,
     (error, stdout, stderr) => {
       if (error) {
-        console.error("Error merging PDFs:", stderr);
-        res.status(500).json({ error: "PDF merging failed" });
+        console.error('Error merging PDFs:', stderr || error.message);
+        res.status(500).json({ error: stderr || error.message });
         return;
-      }
+    }
 
-      res.status(200).json({
+    console.log('Merge Script Output:', stdout);
+    res.status(200).json({
         message: "PDF generated and merged successfully",
-        downloadLink: `${req.protocol}://${req.get(
-          "host"
-        )}/pdfs/final_quotation.pdf`,
-      });
+        downloadLink: `${req.protocol}://${req.get('host')}/pdfs/final_quotation.pdf`,
+    });
     }
   );
 });
