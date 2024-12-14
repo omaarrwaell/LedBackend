@@ -8,7 +8,7 @@ const app = express();
 
 // Middleware to parse incoming JSON data
 app.use(express.json());
- // For JSON payloads
+// For JSON payloads
 app.use(express.urlencoded({ extended: true }));
 const cors = require("cors");
 app.use(cors());
@@ -30,7 +30,7 @@ app.get("/users", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-app.use('/pdfs', express.static('pdfs'));
+app.use("/pdfs", express.static("pdfs"));
 
 app.use("/module", require("./Routes/module_routes"));
 app.use("/auth", require("./Routes/auth_routes"));
@@ -40,6 +40,6 @@ app.use("/receivingCard", require("./Routes/receivingCard_routes"));
 app.use("/powerSupply", require("./Routes/powerSupply_routes"));
 // Start the server
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
