@@ -34,5 +34,24 @@ const controllerCreation = asyncHandler(async (req, res) => {
     }
 
 });
-
-module.exports = {getAllControllers, controllerCreation}
+//create function to edit the quantity of a controller
+const updateController = asyncHandler(async (req, res) => {
+    try {
+        const controller = await Controller.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).json(controller);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "error": error })
+    }
+});
+//create function to delete controller
+const deleteController = asyncHandler(async (req, res) => {
+    try {
+        const controller = await Controller.findByIdAndDelete(req.params.id);
+        res.status(200).json(controller);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "error": error })
+    }
+})
+module.exports = {getAllControllers, controllerCreation,updateController,deleteController};

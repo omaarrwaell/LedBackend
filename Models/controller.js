@@ -19,6 +19,10 @@ const ControllerSchema = new mongoose.Schema({
     type: String,
     required: true
   }
+  ,quantity : {
+    type: Number,
+    
+  }
 });
 
 // Create the Module model
