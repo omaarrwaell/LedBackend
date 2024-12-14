@@ -33,13 +33,13 @@ const userLogin = asyncHandler(async (req, res) => {
     });
   }
 
-  return res.status(500).json({ error: "Invalid email or password" });
+  return res.status(401).json({ error: "Invalid email or password" });
 });
 
 const generateToken = (id, role, email) => {
   return jwt.sign({ id, role, email }, process.env.JWT_SECRET, {
     algorithm: "HS256",
-    expiresIn: "2h",
+    expiresIn: "1h",
   });
 };
 
