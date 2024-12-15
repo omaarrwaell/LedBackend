@@ -186,25 +186,66 @@ const generateStyledPDF = asyncHandler(async (req, res) => {
     .moveDown()
     .fontSize(10)
     .text("S/N", 50, 160)
+    //.text("|", 80, 160)
     .text("Commodity", 100, 160, { width: 140 })
+    //.text("|", 240, 160)
     .text("Quantity", 250, 160)
+   // .text("|", 300, 160)
     .text("Unit", 320, 160)
-    .text("Unit Price (EGP)", 380, 160)
+   // .text("|", 360, 160)
+    .text("Unit Price (EGP)", 370, 160)
+    //.text("|", 450, 160)
     .text("Total Price (EGP)", 460, 160);
 
   doc.moveTo(50, 175).lineTo(550, 175).stroke();
 
   // Table Rows
-  let y = 180;
+  let y = 190;
+  doc
+  .moveTo(80, 160)
+  .lineTo(80, y + 200) // Adjust the height based on table content
+  //.dash(2, { space: 2 })
+  .stroke();
 
+doc
+  .moveTo(240, 160)
+  .lineTo(240, y + 200)
+ // .dash(2, { space: 2 })
+  .stroke();
+
+doc
+  .moveTo(300, 160)
+  .lineTo(300, y + 200)
+  //.dash(2, { space: 2 })
+  .stroke();
+
+doc
+  .moveTo(360, 160)
+  .lineTo(360, y + 200)
+  //.dash(2, { space: 2 })
+  .stroke();
+
+doc
+  .moveTo(450, 160)
+  .lineTo(450, y + 200)
+ // .dash(2, { space: 2 })
+  .stroke();
+
+// doc
+//   .moveTo(550, 160)
+//   .lineTo(550, y + 200)
+//   //.dash(2, { space: 2 })
+//   .stroke(); 
   // Add items based on new `screenData` structure
   const items = [
     {
       name: `P${screenData.pixelpitch} ${screenData.type2}  LED display 
+Actual Size: ${screenData.screenWidth}*${screenData.screenHeight}m
+Screen Area : ${screenData.screenArea} m2
 +Novastar receiver card+
 G-energy Power supply+
 Module Size: 32*16cm
-Display Size: ${screenData.screenWidth}*${screenData.screenHeight}m`,
+`,
       quantity: 1,
       unit: "pcs",
       unitPrice: 0,
@@ -237,18 +278,34 @@ Display Size: ${screenData.screenWidth}*${screenData.screenHeight}m`,
       unit: "pcs",
       unitPrice: 0,
       totalPrice: screenData.numberOfReceivingCards * 0,
+    },{
+      name: "Cabinets Number",
+      quantity: screenData.cabinetsNumber,
+      unit: "pcs",
+      unitPrice: 0,
+      totalPrice: screenData.cabinetsNumber * 0,
     },
   ];
 
   items.forEach((item, index) => {
     const itemHeight = item.name.split("\n").length * 12;
+    if (index === 0) {
+      doc.font("Helvetica-Bold");
+    } else {
+      doc.font("Helvetica");
+    }
     doc
       .fontSize(8)
       .text(index + 1, 50, y)
+      //.text("|", 80, y)
       .text(item.name, 100, y)
+      //.text("|", 240, y)
       .text(item.quantity, 250, y)
+     // .text("|", 300, y)
       .text(item.unit, 320, y)
+     // .text("|", 360, y)
       .text(`${item.unitPrice}`, 380, y)
+     // .text("|", 450, y)
       .text(`${item.totalPrice}`, 470, y);
     y += Math.max(itemHeight, 20);
   });
@@ -258,13 +315,13 @@ Display Size: ${screenData.screenWidth}*${screenData.screenHeight}m`,
 
   y += 10;
   doc
-    .fontSize(12)
-    .text("Total Amount (EGP):", 340, y)
+    .fontSize(9)
+    .text("Total Amount (EGP):", 365, y)
     .text(`${screenData.totalPrice.toFixed(2)}`, 470, y);
 
   // Footer Section
   y += 40;
-  doc.moveTo(50, y).lineTo(550, y).stroke().moveDown();
+  //doc.moveTo(50, y).lineTo(550, y).stroke().moveDown();
 
   y += 10;
   doc
